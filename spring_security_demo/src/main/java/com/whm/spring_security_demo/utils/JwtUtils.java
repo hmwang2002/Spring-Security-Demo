@@ -1,6 +1,6 @@
 package com.whm.spring_security_demo.utils;
 
-import com.whm.spring_security_demo.domain.entity.UserEntity;
+import com.whm.spring_security_demo.domain.vo.LoginUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.Data;
@@ -54,12 +54,12 @@ public class JwtUtils {
      * @return 要生成的Token字符串
      */
     public static String generateToken(UserDetails userDetails) {
-        UserEntity user = (UserEntity) userDetails;
+        LoginUser user = (LoginUser) userDetails;
         //用于存储Payload中的信息
         Map<String, Object> claims = new HashMap<>();
         String username = user.getUsername();
         //设置有效载荷(Payload)
-        claims.put("Id", user.getId());
+        claims.put("Id", user.getUser().getId());
         claims.put("Username", username);
         //签发时间
         claims.put(Claims.ISSUED_AT, new Date());
