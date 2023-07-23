@@ -4,7 +4,8 @@ import com.whm.spring_security_demo.domain.vo.LoginUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.Data;
-import org.springframework.data.redis.core.RedisTemplate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,8 @@ public class JwtUtils {
     //Token的加密算法，默认使用HS256
     private static SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     //服务端的Token缓存，默认使用Redis
-    private static RedisTemplate<String, Object> tokenCache = new RedisTemplate<>();
+    @Autowired
+    private RedisCache redisCache;
 
     /*================================= 方法 =================================*/
 
@@ -53,7 +55,7 @@ public class JwtUtils {
      * @param userDetails 用于生成Token的用户信息
      * @return 要生成的Token字符串
      */
-    public static String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails) {
         LoginUser user = (LoginUser) userDetails;
         //用于存储Payload中的信息
         Map<String, Object> claims = new HashMap<>();
@@ -74,7 +76,8 @@ public class JwtUtils {
                 .compact();//生成字符串类型的Token
         //将生成的Token字符串存入Redis，同时设置缓存有效期
         if(StringUtils.hasText(token)){
-            tokenCache.opsForValue().set(username, token, expirationTime, TimeUnit.MILLISECONDS);
+            redisCache.setCacheObject(username, token, expirationTime, TimeUnit.MILLISECONDS);
+//            tokenCache.opsForValue().set(username, token, expirationTime, TimeUnit.MILLISECONDS);
         }
         return token;
     }
@@ -85,7 +88,7 @@ public class JwtUtils {
      * @param token 客户端携带过来的要验证的Token
      * @return Token是否有效
      */
-    public static boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try{
             if(isTokenExpired(token)){
                 return false;
@@ -103,7 +106,7 @@ public class JwtUtils {
      * @param token 要判断的Token字符串
      * @return 是否过期
      */
-    private static boolean isTokenExpired(String token) throws JwtException{
+    private boolean isTokenExpired(String token) throws JwtException{
         try{
             //从Token中获取有效载荷
             Claims claims = parseToken(token);
@@ -113,7 +116,8 @@ public class JwtUtils {
                 return true;
             }
             //通过用户名从缓存中获取指定的Token
-            Object cacheToken = tokenCache.opsForValue().get("Username");
+            Object cacheToken = redisCache.getCacheObject("Username");
+//            Object cacheToken = tokenCache.opsForValue().get("Username");
             if(StringUtils.isEmpty(cacheToken)){
                 return true;
             }
@@ -129,7 +133,7 @@ public class JwtUtils {
      * @param key 有效载荷中元素的Key
      * @return 要获取的元素
      */
-    public static Object getElement(String token, String key) {
+    public Object getElement(String token, String key) {
         Object element;
         try{
             Claims claims = parseToken(token);
@@ -149,7 +153,7 @@ public class JwtUtils {
      * @param <T> 元素的类型
      * @return 要获取的元素
      */
-    public static <T> T getElement(String token, String key, Class<T> clazz) {
+    public <T> T getElement(String token, String key, Class<T> clazz) {
         T element;
         try{
             Claims claims = parseToken(token);
@@ -176,7 +180,7 @@ public class JwtUtils {
      * @return 要获取的有效载荷
      * @throws JwtException Token解析错误的异常信息
      */
-    public static Claims parseToken(String token) throws JwtException{
+    public Claims parseToken(String token) throws JwtException{
         //在JwtParser解析器中配置用于解析的密钥，然后将Token字符串解析为Jws对象，最后从Jws对象中获取Claims
         Claims claims = Jwts
                 .parser() //获取DefaultJwtParser
@@ -193,8 +197,9 @@ public class JwtUtils {
      * @param object 要获取指定Token的对应的Key
      * @return Token字符串
      */
-    public static String getTokenFromCache(Object object){
-        Object rowToken = tokenCache.opsForValue().get(object);
+    public String getTokenFromCache(Object object){
+        Object rowToken = redisCache.getCacheObject((String) object);
+//        Object rowToken = tokenCache.opsForValue().get(object);
         if(StringUtils.isEmpty(rowToken)){
             return null;
         }
@@ -206,8 +211,9 @@ public class JwtUtils {
      * @param key 要移除指定Token的对应的Key
      * @return 是否成功移除
      */
-    public static boolean removeTokenFromCache(String key){
-        return tokenCache.delete(key);
+    public boolean removeTokenFromCache(String key){
+        return redisCache.deleteObject(key);
+//        return tokenCache.delete(key);
     }
 
     /*================================= 属性设置器 =================================*/

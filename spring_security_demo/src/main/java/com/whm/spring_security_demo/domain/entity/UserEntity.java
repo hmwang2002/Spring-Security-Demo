@@ -21,8 +21,8 @@ public class UserEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = -6592972053673427168L;
 
-    @TableId(type = IdType.INPUT)
-    private Integer id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     @TableField("username")
     private String username;

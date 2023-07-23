@@ -26,6 +26,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         LambdaQueryWrapper<UserEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserEntity::getUsername, username);
         UserEntity user = userMapper.selectOne(queryWrapper);
+        user.setPassword("{bcrypt}" + user.getPassword());
         // 如果没有查询到用户就抛出异常
         if (Objects.isNull(user)) {
             throw new UsernameNotFoundException("用户名或密码不正确");

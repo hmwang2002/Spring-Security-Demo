@@ -40,7 +40,7 @@ public class RedisCache {
      * @param <T>
      * @return   缓存的对象
      */
-    public <T> ValueOperations<String, T> setCacheObject(String key, T value, Integer timeout, TimeUnit timeUnit){
+    public <T> ValueOperations<String, T> setCacheObject(String key, T value, Long timeout, TimeUnit timeUnit){
         ValueOperations<String, T> operations = redisTemplate.opsForValue();
         operations.set(key, value, timeout, timeUnit);
         return operations;
@@ -63,8 +63,8 @@ public class RedisCache {
      *
      * @param key
      */
-    public void deleteObject(String  key){
-        redisTemplate.delete(key);
+    public boolean deleteObject(String  key){
+        return redisTemplate.delete(key);
     }
 
 
