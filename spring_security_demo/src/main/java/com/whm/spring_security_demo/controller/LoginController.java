@@ -28,6 +28,9 @@ public class LoginController {
 
     @RequestMapping("/user/register")
     public Response register(@RequestParam String username, @RequestParam String password) {
+        if (loginService.findByUsername(username)) {
+            return Response.failed(999, "用户名已经存在");
+        }
         UserEntity user = UserEntity.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))

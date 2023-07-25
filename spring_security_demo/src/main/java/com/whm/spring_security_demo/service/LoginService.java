@@ -10,4 +10,6 @@ import com.whm.spring_security_demo.domain.vo.Response;
  */
 public interface LoginService extends IService<UserEntity> {
     public Response login(String username, String password);
+
+    public boolean findByUsername(String username);
 }

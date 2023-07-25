@@ -77,7 +77,6 @@ public class JwtUtils {
         //将生成的Token字符串存入Redis，同时设置缓存有效期
         if(StringUtils.hasText(token)){
             redisCache.setCacheObject(username, token, expirationTime, TimeUnit.MILLISECONDS);
-//            tokenCache.opsForValue().set(username, token, expirationTime, TimeUnit.MILLISECONDS);
         }
         return token;
     }
@@ -116,8 +115,7 @@ public class JwtUtils {
                 return true;
             }
             //通过用户名从缓存中获取指定的Token
-            Object cacheToken = redisCache.getCacheObject("Username");
-//            Object cacheToken = tokenCache.opsForValue().get("Username");
+            Object cacheToken = redisCache.getCacheObject(username);
             if(StringUtils.isEmpty(cacheToken)){
                 return true;
             }

@@ -20,19 +20,19 @@ import java.io.IOException;
 public class BeforeLogoutFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
-    private ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
+    private ThreadLocal<String> threadLocal = new ThreadLocal<>();
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().contains("/user/logout")) {
             String token = request.getHeader("token");
-            Integer userId = jwtUtils.getElement(token, "Id", Integer.class);
-            threadLocal.set(userId);
+            String username = jwtUtils.getElement(token, "Username", String.class);
+            threadLocal.set(username);
         }
         filterChain.doFilter(request, response);
     }
 
-    public Integer getUserId() {
-        Integer ret = threadLocal.get();
+    public String getUsername() {
+        String ret = threadLocal.get();
         threadLocal.remove();
         return ret;
     }

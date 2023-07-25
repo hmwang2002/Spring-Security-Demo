@@ -17,7 +17,7 @@ public class ResponseUtils {
         response.getWriter().write(JSON.toJSONString(Response.success(code, message)));
     }
 
-    public static void setSFailedResponse(HttpServletResponse response, int code, String message) throws IOException {
+    public static void setFailedResponse(HttpServletResponse response, int code, String message) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(code);

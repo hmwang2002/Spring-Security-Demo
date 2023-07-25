@@ -4,6 +4,7 @@ import com.whm.spring_security_demo.filter.BeforeLogoutFilter;
 import com.whm.spring_security_demo.filter.JwtAuthenticationTokenFilter;
 import com.whm.spring_security_demo.service.impl.UserDetailServiceImpl;
 import com.whm.spring_security_demo.utils.RedisCache;
+import com.whm.spring_security_demo.utils.ResponseUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -78,8 +79,9 @@ public class SecurityConfig {
      */
     private void onLogOutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setHeader("token", "");
-        Integer userId = beforeLogoutFilter.getUserId();
-        redisCache.deleteObject("login:" + userId);
+        String username = beforeLogoutFilter.getUsername();
+        redisCache.deleteObject(username);
+        ResponseUtils.setSuccessResponse(response, 200, "退出成功");
     }
 
     /**
