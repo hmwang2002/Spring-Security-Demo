@@ -48,6 +48,7 @@ public class SecurityConfig {
         SecurityFilterChain securityFilterChain = http
                 .cors(cors -> cors.configurationSource(this.corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(sessionManagement -> sessionManagement.disable())
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.requestMatchers("/user/login", "/user/register").anonymous()
                         .anyRequest().authenticated())
