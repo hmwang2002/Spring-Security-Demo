@@ -20,7 +20,7 @@ import java.io.IOException;
 public class BeforeLogoutFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
-    private ThreadLocal<Integer> threadLocal;
+    private ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (request.getRequestURI().contains("/user/logout")) {
