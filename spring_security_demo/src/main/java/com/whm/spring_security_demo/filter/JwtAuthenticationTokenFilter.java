@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author whm
@@ -41,22 +42,32 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         // 解析token
         String userid;
         try {
-            userid = jwtUtils.getElement(token, "Id", String.class);
+            userid = Integer.toString(jwtUtils.getElement(token, "Id", Integer.class));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("token非法");
         }
         // 从redis中获取用户信息
         String redisKey = "login:" + userid;
-        LoginUser user = redisCache.getCacheObject(redisKey);
-        if (user == null) {
+        Map<String, String> tokenMap = redisCache.getCacheMap(redisKey);
+        if (tokenMap == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        String redisToken = tokenMap.get("token");
+        if (!redisToken.equals(token)) {
             throw new RuntimeException("用户未登录");
         }
+        // TODO:token过期的问题
+        if (!jwtUtils.validateToken(token)) {
+
+        }
+        String username = jwtUtils.getElement(token, "Username", String.class);
         // 存入SecurityContextHolder
         // TODO 获取权限信息封装到Authentication
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user, null, null);
+                new UsernamePasswordAuthenticationToken(username, null, null);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        response.setHeader("token", token);
         // 放行
         filterChain.doFilter(request, response);
     }

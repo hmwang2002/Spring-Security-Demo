@@ -199,7 +199,6 @@ public class JwtUtils {
      */
     public String getTokenFromCache(Object object){
         Object rowToken = redisCache.getCacheObject((String) object);
-//        Object rowToken = tokenCache.opsForValue().get(object);
         if(StringUtils.isEmpty(rowToken)){
             return null;
         }
@@ -213,7 +212,6 @@ public class JwtUtils {
      */
     public boolean removeTokenFromCache(String key){
         return redisCache.deleteObject(key);
-//        return tokenCache.delete(key);
     }
 
     /*================================= 属性设置器 =================================*/
