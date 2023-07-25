@@ -4,7 +4,6 @@ import com.whm.spring_security_demo.domain.vo.LoginUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;

@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,13 +29,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
         LambdaQueryWrapper<UserEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserEntity::getUsername, username);
         UserEntity user = userMapper.selectOne(queryWrapper);
-        user.setPassword("{bcrypt}" + user.getPassword());
         // 如果没有查询到用户就抛出异常
         if (Objects.isNull(user)) {
             throw new UsernameNotFoundException("用户名或密码不正确");
         }
+        user.setPassword("{bcrypt}" + user.getPassword());
+        //TODO：查询对应的权限信息,一般实现思路是从数据库中查询权限信息，不过我并没有将权限信息读取到redis中，如果有权限要求的话
+        // 后续还要修改redis的读取
 
-        //TODO 查询对应的权限信息
         return new LoginUser(user);
     }
 }
