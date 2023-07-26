@@ -1,8 +1,8 @@
 package com.whm.spring_security_demo.config;
 
-import com.whm.spring_security_demo.filter.BeforeLogoutFilter;
 import com.whm.spring_security_demo.filter.JwtAuthenticationTokenFilter;
 import com.whm.spring_security_demo.service.impl.UserDetailServiceImpl;
+import com.whm.spring_security_demo.utils.JwtUtils;
 import com.whm.spring_security_demo.utils.RedisCache;
 import com.whm.spring_security_demo.utils.ResponseUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,7 +40,7 @@ public class SecurityConfig {
     private final UserDetailServiceImpl userDetailService;
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     private final RedisCache redisCache;
-    private final BeforeLogoutFilter beforeLogoutFilter;
+    private final JwtUtils jwtUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -54,7 +53,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .logout(logout -> logout.logoutUrl("/user/logout").deleteCookies("JSESSIONID").logoutSuccessHandler(this::onLogOutSuccess))
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(beforeLogoutFilter, LogoutFilter.class)
                 .build();
         return securityFilterChain;
     }
@@ -76,7 +74,8 @@ public class SecurityConfig {
      */
     private void onLogOutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setHeader("token", "");
-        String username = beforeLogoutFilter.getUsername();
+        String token = request.getHeader("token");
+        String username = jwtUtils.getElement(token, "Username", String.class);
         redisCache.deleteObject(username);
         ResponseUtils.setSuccessResponse(response, 200, "退出成功");
     }
