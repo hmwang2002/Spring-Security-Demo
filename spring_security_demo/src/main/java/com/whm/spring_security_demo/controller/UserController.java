@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2023/7/22 19:28
  */
 @RestController
-public class LoginController {
+public class UserController {
     @Autowired
     private LoginService loginService;
 
