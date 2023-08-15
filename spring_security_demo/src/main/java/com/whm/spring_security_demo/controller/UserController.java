@@ -3,7 +3,7 @@ package com.whm.spring_security_demo.controller;
 import com.whm.spring_security_demo.domain.entity.UserEntity;
 import com.whm.spring_security_demo.domain.vo.Response;
 import com.whm.spring_security_demo.service.LoginService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2023/7/22 19:28
  */
 @RestController
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @RequestMapping("/user/login")
     public Response login(@RequestParam String username, @RequestParam String password) {
